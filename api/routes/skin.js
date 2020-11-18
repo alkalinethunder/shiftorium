@@ -6,6 +6,8 @@ const Upload = mongoose.model('upload')
 const Skin = mongoose.model('skin')
 const jwt = require('../config/jwt')
 
+const Utils = require('../utils')
+
 const router = Express.Router()
 
 router.get('/', async function(req, res) {
@@ -48,6 +50,8 @@ router.post('/', jwt.authenticated, async function (req, res) {
   skin.generateSlug()
 
   await skin.save()
+
+  await Utils.postAuditLog('created a skin', req.user, null, skin.slug)
 
   res.status(200).json({
     result: skin,
@@ -147,6 +151,8 @@ router.post('/:id/screenshots', jwt.authenticated, async function(req, res) {
   skin.screenshots.push(upload)
 
   await skin.save()
+
+  await Utils.postAuditLog('added screenshot to a skin', req.user, null, skin.slug)
 
   res.status(200).json({
     result: skin,

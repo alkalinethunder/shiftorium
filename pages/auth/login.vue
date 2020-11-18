@@ -7,6 +7,13 @@
       <v-card>
         <v-card-title class="headline">Log In</v-card-title>
         <v-form @submit="tryLogin">
+          <v-card v-if="error.active" color="error" outlined>
+            <v-card-text>
+              <strong>Error:</strong>
+              {{ errors }}
+            </v-card-text>
+          </v-card>
+
           <v-card-text>
             <v-text-field
               v-model="form.email"
@@ -43,6 +50,7 @@
 
 <script>
 export default {
+  middleware: 'auth',
   layout: 'landing',
   auth: 'guest',
   data() {
@@ -53,7 +61,16 @@ export default {
         password: '',
         loading: false,
       },
+      error: {
+        messages: [],
+        active: false,
+      },
     }
+  },
+  computed: {
+    errors() {
+      return this.error.messages.join(' ')
+    },
   },
   methods: {
     async tryLogin(evt) {
@@ -65,9 +82,15 @@ export default {
 
       try {
         await this.$auth.loginWith('login', { data: payload })
-        this.$router.go('/app/profile')
+        this.$router.replace('/app/profile')
       } catch (err) {
-        alert(err)
+        this.error.active = true
+
+        if (err.response) {
+          this.error.messages = err.response.data.errors
+        } else {
+          this.error.messages = [err.message]
+        }
       }
     },
   },

@@ -43,6 +43,12 @@ export default {
   ],
 
   auth: {
+    redirects: {
+      login: '/auth/login',
+      home: '/app',
+      logout: '/auth/logout',
+    },
+    rewriteRedirects: true,
     strategies: {
       login: {
         _scheme: '~/schemes/refresh.js',

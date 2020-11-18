@@ -12,6 +12,10 @@ const UserSchema = new Schema({
     color: { type: String, required: false, default: 'primary'},
     firstName: { type: String, required: false, default: '' },
     lastName: { type: String, required: false, default: '' },
+    admin: { type: Boolean, required: true, default: false },
+    owner: { type: Boolean, required: true, default: false },
+    shadowBanned: { type: Boolean, required: true, default: false },
+    suspended: { type: Boolean, required: true, default: false },
 })
 
 UserSchema.methods.setPassword = function(password) {

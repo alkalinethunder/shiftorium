@@ -8,6 +8,8 @@ const mime = require('mime-types')
 const multer = require('multer')
 const { isValidObjectId } = require('mongoose')
 
+const Utils = require('../utils')
+
 const { ObjectId } = mongoose
 
 const router = Express.Router()
@@ -83,6 +85,8 @@ router.post('/', jwt.authenticated, async function(req, res) {
       upload.generateSlug()
 
       await upload.save()
+
+      await Utils.postAuditLog('uploaded a file', req.user, null, upload.slug)
 
       res.status(200).json({
         errors: [],

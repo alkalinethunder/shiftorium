@@ -3,6 +3,8 @@ const Express = require('express')
 const User = mongoose.model('user')
 const jwtMiddleware = require('../config/jwt')
 
+const Utils = require('../utils')
+
 const router = Express.Router();
 
 router.get('/user', jwtMiddleware.authenticated, async function (req, res) {
@@ -120,6 +122,8 @@ router.post('/signup', async function (req, res) {
         user.setPassword(password)
 
         await user.save()
+
+        await Utils.postAuditLog('created a user', null, user)
 
         res.status(200).json({
             errors: [],
