@@ -10,6 +10,7 @@ const UploadSchema = new Schema({
   path: { type: String, required: true },
   mimetype: { type: String, required: true },
   filename: { type: String, required: true },
+  size: { type: Number, required: true, default: 0 },
 })
 
 UploadSchema.methods.open = function() {

@@ -25,6 +25,12 @@ function validateFile(req, file, callback) {
     }
 
     callback(null, true)
+  } else if (req.body.type == 'image') {
+    if (!file.mimetype.startsWith('image/')) {
+      return callback('Image uploads must be valid image files.', false)
+    }
+
+    callback(null, true)
   } else {
     return callback('This upload type is not supported.', false)
   }
@@ -70,7 +76,8 @@ router.post('/', jwt.authenticated, async function(req, res) {
         path: req.file.path,
         mimetype: req.file.mimetype,
         author: req.user,
-        filename: req.file.originalname
+        filename: req.file.originalname,
+        size: req.file.size,
       })
 
       upload.generateSlug()

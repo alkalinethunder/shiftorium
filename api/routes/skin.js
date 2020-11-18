@@ -55,10 +55,30 @@ router.post('/', jwt.authenticated, async function (req, res) {
   })
 })
 
+router.get('/page/:page/:items', async function(req, res) {
+  const skins = await Skin.find({})
+  const listing = []
+  const { page, items } = req.params
+
+  const itemsStart = page * items
+  const itemsEnd = Math.min(itemsStart + items, skins.length)
+
+  for (let i = itemsStart; i < itemsEnd; i++) {
+    listing.push(skins[i])
+  }
+
+  res.status(200).json({
+    errors: [],
+    result: listing,
+  })
+})
+
 router.get('/:id', async function(req, res) {
   const skin = await Skin.findOne({slug: req.params.id})
     .populate('author')
     .populate('download')
+    .populate('thumbnail')
+    .populate('screenshots')
 
   if (skin) {
     res.status(200).json({
@@ -71,6 +91,67 @@ router.get('/:id', async function(req, res) {
       errors: ['Skin not found.']
     })
   }
+})
+
+router.post('/:id', jwt.authenticated, async function (req, res) {
+  const skin = await Skin.findOne({slug: req.params.id})
+
+  if (!skin) {
+    return res.status(404).json({
+      error: ['Skin not found.'],
+      result: null
+    })
+  }
+
+  if (skin.author != req.user._id) {
+    return res.status(403).json({
+      errors: ['You do not have permission to edit this skin.'],
+      result: null
+    })
+  }
+})
+
+router.post('/:id/screenshots', jwt.authenticated, async function(req, res) {
+  const upload = await Upload.findOne(req.body)
+
+  if (!upload) {
+    return res.status(400).json({
+      result: null,
+      errors: ['You must specify an upload object to add to the skin\'s screenshot list.']
+    })
+  }
+
+  if (!upload.mimetype.startsWith('image/')) {
+    return res.status(400).json({
+      errors: ['Upload must be an image.'],
+      result: null
+    })
+  }
+
+  const skin = await Skin.findOne({ slug: req.params.id })
+
+  if (!skin) {
+    res.status(404).json({
+      errors: ['Skin not found.'],
+      result: null
+    })
+  }
+
+  if (skin.author != req.user._id) {
+    res.status(403).json({
+      errors: ['You do not have permission to post screenshots to this skin.'],
+      result: null
+    })
+  }
+
+  skin.screenshots.push(upload)
+
+  await skin.save()
+
+  res.status(200).json({
+    result: skin,
+    errors: []
+  })
 })
 
 module.exports = router

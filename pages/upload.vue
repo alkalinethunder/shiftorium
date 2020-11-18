@@ -237,12 +237,12 @@ export default {
       this.form.type = 'mod'
       this.step++
     },
-    async pushSkin() {
+    async pushSkin(evt) {
+      evt.preventDefault()
+
       try {
         const response = await this.$axios.post('/api/skin', this.publicForm)
-        this.$router.replace(
-          `/skin/${this.$auth.user.username}/${response.data.result.slug}`,
-        )
+        this.$router.replace(`/app/skin/${response.data.result.slug}`)
       } catch (err) {
         this.$nuxt.error(err)
       }
