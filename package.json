@@ -24,7 +24,8 @@
     "multer": "^1.4.2",
     "nuxt-edge": "latest",
     "pretty-bytes": "^5.4.1",
-    "slugify": "^1.4.6"
+    "slugify": "^1.4.6",
+    "vue-markdown-renderer": "^0.2.7"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",

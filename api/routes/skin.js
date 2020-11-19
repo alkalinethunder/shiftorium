@@ -98,19 +98,43 @@ router.get('/:id', async function(req, res) {
 })
 
 router.post('/:id', jwt.authenticated, async function (req, res) {
-  const skin = await Skin.findOne({slug: req.params.id})
+  try {
+    const { description, markdown, name } = req.body
+    const skin = await Skin.findOne({slug: req.params.id})
+      .populate('author')
 
-  if (!skin) {
-    return res.status(404).json({
-      error: ['Skin not found.'],
-      result: null
+    if (!skin) {
+      return res.status(404).json({
+        error: ['Skin not found.'],
+        result: null
+      })
+    }
+
+    if (skin.author.email != req.user.email) {
+      return res.status(403).json({
+        errors: ['You do not have permission to edit this skin.'],
+        result: null
+      })
+    }
+
+    skin.name = name || skin.name
+    skin.description = description || skin.description
+    skin.markdown = markdown || skin.markdown
+
+    await skin.validateEdits()
+
+    await skin.save()
+
+    await Utils.postAuditLog('edited a skin', req.user)
+
+    res.status(200).json({
+      errors: [],
+      result: skin,
     })
-  }
-
-  if (skin.author != req.user._id) {
-    return res.status(403).json({
-      errors: ['You do not have permission to edit this skin.'],
-      result: null
+  } catch (err) {
+    res.status(400).json({
+      errors: [err.message],
+      result: null,
     })
   }
 })

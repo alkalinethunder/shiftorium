@@ -6022,6 +6022,11 @@ markdown-table@^2.0.0:
   dependencies:
     repeat-string "^1.0.0"
 
+marked@^1.0.0:
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-1.2.5.tgz#a44b31f2a0b8b5bfd610f00d55d1952d1ac1dfdb"
+  integrity sha512-2AlqgYnVPOc9WDyWu7S5DJaEZsfk6dNh/neatQ3IHUW4QLutM/VPSH9lG7bif+XjFWc9K9XR3QvR+fXuECmfdA==
+
 mathml-tag-names@^2.1.3:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/mathml-tag-names/-/mathml-tag-names-2.1.3.tgz#4ddadd67308e780cf16a47685878ee27b736a0a3"
@@ -9867,6 +9872,13 @@ vue-loader@^15.9.5:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-markdown-renderer@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/vue-markdown-renderer/-/vue-markdown-renderer-0.2.7.tgz#09ce3d9d8d08637fe6599db38376f8bfdb4b2130"
+  integrity sha512-FAOppeZ/2vXKC2MLt4SyaezjUbJIIn+uyBNCGolo/wlv3eQ6jbCvcEbVvwL2ynD5lQyHwlYS23SkckU5E1insQ==
+  dependencies:
+    marked "^1.0.0"
 
 vue-meta@^2.4.0:
   version "2.4.0"
