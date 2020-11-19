@@ -32,4 +32,39 @@ UserSchema.methods.validatePassword = function(password) {
     return this.hash == test
 }
 
+UserSchema.methods.canSuspend = function(admin) {
+  if (this.suspended) return false
+  if (this.owner) return false
+  if (this.admin && !admin.owner) return false
+  if (this._id == admin._id) return false
+  if (this.email == 'System') return false
+  return true
+}
+
+UserSchema.methods.shadowban = async function (instigator) {
+  const Utils = require('../utils')
+
+  if (instigator._id == this._id)
+    throw new Error('Cannot shadowban yourself.')
+
+  if (this.owner)
+    throw new Error('Cannot shadowban a site owner')
+
+  if (this.admin && !instigator.owner)
+    throw new Error('Cannot shadowban a user as a non-siteowner.')
+
+  if (this.email === 'System')
+    throw new Error('Cannot modify the system user.')
+
+  this.shadowBanned = !this.shadowBanned
+
+  if (!this.shadowBanned) {
+    await Utils.postAuditLog('revoked a shadow-ban', instigator, this)
+  } else {
+    await Utils.postAuditLog('shadow-banned a user', instigator, this)
+  }
+
+  await this.save()
+}
+
 module.exports = Mongoose.model('user', UserSchema)

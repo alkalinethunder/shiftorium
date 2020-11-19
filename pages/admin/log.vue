@@ -126,6 +126,8 @@ export default {
       return new Date(b.date) - new Date(a.date)
     },
     async loadMore() {
+      if (this.endOfStream) return false
+
       this.loading = true
 
       try {

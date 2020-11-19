@@ -161,6 +161,41 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="isSuspendingUser" width="400">
+      <v-form v-model="suspensionValid" @submit="submitSuspension">
+        <v-card v-if="isSuspendingUser">
+          <v-card-title class="headline">Suspend This User</v-card-title>
+
+          <v-card-text>
+            <p>
+              Are you sure you want to suspend this user from accessing the
+              Shiftorium?
+            </p>
+            <v-text-field
+              v-model="suspensionReason"
+              label="Reason"
+              hint="Enter a reason for why the user is suspended."
+              outlined
+              required
+            />
+          </v-card-text>
+          <v-divider />
+          <v-card-actions>
+            <v-spacer />
+            <v-btn text @click.stop="isSuspending = false">Cancel</v-btn>
+            <v-btn
+              text
+              color="error"
+              type="submit"
+              :disabled="!suspensionValid"
+            >
+              Suspend
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+
     <div v-intersect="loadMore" />
   </div>
 </template>
@@ -180,6 +215,9 @@ export default {
         active: false,
         messages: [],
       },
+      suspensionReason: '',
+      isSuspendingUser: false,
+      suspensionValid: false,
       isViewingUser: false,
       currentUser: null,
     }
@@ -235,10 +273,45 @@ export default {
       this.currentUser = entry
       this.isViewingUser = true
     },
+    async submitSuspension(evt) {
+      try {
+        evt.preventDefault()
+        const response = await this.$axios.post(
+          `/api/admin/user/${this.currentUser._id}/suspend`,
+          {
+            reason: this.suspensionReason,
+          },
+        )
+        this.currentUser.suspended = response.data.result.suspended
+        this.suspensionReason = ''
+        this.isSuspendingUser = false
+      } catch (err) {
+        alert(err)
+      }
+    },
+    suspend() {
+      if (this.currentUser.suspended) {
+        // todo
+      } else {
+        this.isSuspendingUser = true
+      }
+    },
     byName(a, b) {
       if (b.displayName > a.displayName) return -1
       if (a.displayName > b.displayName) return 1
       return 0
+    },
+    async shadowban() {
+      try {
+        const id = this.currentUser._id
+        const response = await this.$axios.post(
+          `/api/admin/user/${id}/shadowban`,
+        )
+
+        this.currentUser.shadowBanned = response.data.result.shadowBanned
+      } catch (err) {
+        alert(err)
+      }
     },
     async loadMore() {
       this.loading = true

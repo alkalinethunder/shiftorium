@@ -13,6 +13,9 @@
         {{ item.title }}
       </v-btn>
       <v-spacer />
+      <v-btn v-if="$auth.user.owner || $auth.user.admin" text to="/admin">
+        Administrate
+      </v-btn>
       <v-btn text to="/upload">Upload</v-btn>
       <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>mdi-account</v-icon>

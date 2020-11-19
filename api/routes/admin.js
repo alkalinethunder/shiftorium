@@ -47,5 +47,56 @@ router.get('/users/:page/:itemCount', async function(req, res) {
   })
 })
 
+router.post('/user/:id/shadowban', async function(req, res) {
+  const user = await User.findById(req.params.id)
+  if (!user) {
+    res.status(404).json({
+      errors: ['User not found.'],
+      result: null,
+    })
+  } else {
+    try {
+      await user.shadowban(req.user)
+      res.status(200).json({
+        errors: [],
+        result: user,
+      })
+    } catch(err) {
+      res.status(400).json({
+        errors: [err.message],
+        result: null
+      })
+    }
+  }
+})
+
+router.post('/user/:id/suspend', async function(req, res) {
+  const user = await User.findById(req.params.id)
+  const reason = req.body.reason || null
+
+  if (!user) {
+    return res.status(404).json({
+      errors: ['User not found.'],
+      result: null
+    })
+  }
+
+  if (!user.canSuspend(req.user)) {
+    return res.status(403).json({
+      errors: ['Cannot suspend this user.'],
+      result: null,
+    })
+  }
+
+  user.suspended = true;
+
+  await user.save()
+  await Utils.postAuditLog('suspended a user', req.user, user, reason)
+
+  res.status(200).json({
+    errors: [],
+    result: user,
+  })
+})
 
 module.exports = router
