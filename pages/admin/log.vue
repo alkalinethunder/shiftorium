@@ -73,10 +73,16 @@
         </v-list>
 
         <v-card-text>
-          <dl>
-            <dt>Additional information</dt>
-            <dd>{{ currentLog.message }}</dd>
-          </dl>
+          <v-row dense>
+            <v-col v-if="currentLog.recipient" cols="6">
+              <h6 class="overline">Affected User</h6>
+              <p>{{ currentLog.recipientName }}</p>
+            </v-col>
+            <v-col v-for="(info, i) in currentLog.info" :key="i" cols="6">
+              <h6 class="overline">{{ info.name }}</h6>
+              <p>{{ info.value }}</p>
+            </v-col>
+          </v-row>
         </v-card-text>
 
         <v-divider />
@@ -147,6 +153,15 @@ export default {
             }
           } else {
             log.instigatorName = 'System'
+          }
+
+          if (log.recipient) {
+            if (log.recipient.firstName) {
+              log.recipientName =
+                log.recipient.firstName + ' ' + log.recipient.lastName
+            } else {
+              log.recipientName = log.recipient.username
+            }
           }
 
           // time ago

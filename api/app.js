@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 const app = require('express')()
 const morgan = require('morgan')
 
+require ('./models/auditLogInfo')
 require('./models/user')
 require('./models/auditLogEntry')
 require('./models/upload')

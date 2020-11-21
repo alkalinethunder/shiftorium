@@ -14,6 +14,7 @@ router.get('/logs/:page/:itemCount', async function(req, res) {
   const logs = await AuditLog.find({})
     .populate('instigator')
     .populate('recipient')
+    .populate('info')
 
   const start = itemCount * page
   const end = Math.min(start + itemCount, logs.length)
@@ -91,7 +92,9 @@ router.post('/user/:id/suspend', async function(req, res) {
   user.suspended = true;
 
   await user.save()
-  await Utils.postAuditLog('suspended a user', req.user, user, reason)
+  await Utils.postAuditLog('suspended a user', req.user, user, {
+    "Reason": reason,
+  })
 
   res.status(200).json({
     errors: [],

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const AuditLog = mongoose.model('auditLog')
 const User = mongoose.model('user')
 
-module.exports.postAuditLog = async function(action, instigator, recipient, message) {
+module.exports.postAuditLog = async function(action, instigator, recipient, info) {
   if (!instigator) {
     let system = await User.findOne({username: 'System'})
 
@@ -33,12 +33,16 @@ module.exports.postAuditLog = async function(action, instigator, recipient, mess
   }
 
   const log = new AuditLog({
-    message,
+    info: [],
     instigator,
     recipient,
     action,
     date: Date.now()
   })
+
+  for (const key in info) {
+    await log.addInfo(key, info[key])
+  }
 
   await log.save()
 }

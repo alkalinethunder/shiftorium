@@ -51,7 +51,9 @@ router.post('/', jwt.authenticated, async function (req, res) {
 
   await skin.save()
 
-  await Utils.postAuditLog('created a skin', req.user, null, skin.slug)
+  await Utils.postAuditLog('created a skin', req.user, null, {
+    "Skin name": skin.name,
+  })
 
   res.status(200).json({
     result: skin,
@@ -125,7 +127,10 @@ router.post('/:id', jwt.authenticated, async function (req, res) {
 
     await skin.save()
 
-    await Utils.postAuditLog('edited a skin', req.user)
+    await Utils.postAuditLog('edited a skin', req.user, null, {
+      "Skin name": skin.name,
+      "Description": skin.description,
+    })
 
     res.status(200).json({
       errors: [],
@@ -176,7 +181,10 @@ router.post('/:id/screenshots', jwt.authenticated, async function(req, res) {
 
   await skin.save()
 
-  await Utils.postAuditLog('added screenshot to a skin', req.user, null, skin.slug)
+  await Utils.postAuditLog('added screenshot to a skin', req.user, null, {
+    "Skin name": skin.name,
+    "Upload ID": upload.slug,
+  })
 
   res.status(200).json({
     result: skin,
